@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Al-Birr Nursery & Primary School - For Righteousness and Piety" />
+    <title>Al-Birr Nursery & Primary School</title>
+
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Sans+3:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="styles.css" />
+
+    <script>
+      // Force remove any cached favicon
+      function clearOldFavicons() {
+        document.querySelectorAll('link[rel="icon"], link[rel="shortcut icon"], link[rel="apple-touch-icon"]').forEach(link => {
+          link.remove();
+        });
+      }
+
+      // Load uploaded logo as favicon on page load
+      function loadLogoFavicon() {
+        const backendUrl = 'http://localhost:5000';
+        const logoUrl = backendUrl + '/uploads/logo.png?t=' + Date.now();
+
+        // Check if logo exists at the backend
+        fetch(backendUrl + '/api/logo')
+          .then(res => {
+            if (res.ok) {
+              console.log("✅ Logo found, updating favicon...");
+
+              // Remove old favicons
+              clearOldFavicons();
+
+              // Create new favicon link
+              const favicon = document.createElement('link');
+              favicon.rel = 'icon';
+              favicon.type = 'image/png';
+              favicon.href = logoUrl;
+              document.head.appendChild(favicon);
+
+              // Create apple-touch-icon for iOS
+              const appleFavicon = document.createElement('link');
+              appleFavicon.rel = 'apple-touch-icon';
+              appleFavicon.href = logoUrl;
+              document.head.appendChild(appleFavicon);
+
+              console.log("✅ Favicon updated:", logoUrl);
+            } else {
+              console.log('Logo not found (404), using default emoji');
+            }
+          })
+          .catch(err => {
+            console.log('Could not connect to /api/logo:', err.message);
+          });
+      }
+
+      // Load immediately (don't wait for page load)
+      loadLogoFavicon();
+
+      // Also load on page load as backup
+      window.addEventListener('load', loadLogoFavicon);
+
+      // Also try on DOM ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', loadLogoFavicon);
+      }
+    </script>
+  </head>
+  <body>
+
+    <!-- React mounts here -->
+    <div id="root"></div>
+
+    <!-- React + Babel via CDN (for development/demo use) -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- App entry -->
+    <script type="text/babel" src="App.js"></script>
+
+
+  </body>
+</html>
