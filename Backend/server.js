@@ -58,15 +58,14 @@ const upload = multer({
 // =============================================
 //  MIDDLEWARE
 // =============================================
-// app.use(cors({
-//   origin: [
-//     "http://localhost:5000",
-//     "http://127.0.0.1:5500",
-//     "http://localhost:5500",
-//     process.env.FRONTEND_URL,
-//   ].filter(Boolean),
-//   credentials: true,
-// }));
+app.use(cors({
+  origin: [
+    "https://al-birr-school.vercel.app",
+    "http://localhost:5500",
+    "http://127.0.0.1:5500",
+  ],
+  credentials: true,
+}));
 app.use(cors());
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
