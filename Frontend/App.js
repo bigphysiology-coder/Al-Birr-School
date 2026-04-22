@@ -718,7 +718,7 @@ function StaffPage({ onNav, staff }) {
                 >
                   {s.photo ? (
                     <img
-                      src={`http://localhost:5000${s.photo}`}
+                      src={`https://al-birr-school-backend.onrender.com/${s.photo}`}
                       alt={s.name}
                       style={{
                         width: "100%",
@@ -786,7 +786,7 @@ function ContactPage() {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5000/api/contact", {
+      const response = await fetch("https://al-birr-school-backend.onrender.com//api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -945,7 +945,7 @@ function AdminLoginPage({ onLogin , logo }) {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:5000/api/admin/login", {
+      const response = await fetch("https://al-birr-school-backend.onrender.com//api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(credentials),
@@ -1112,7 +1112,7 @@ function AdminDashboard({ token, onLogout, adminPage, setAdminPage, newsItems, e
       showToast("❌ Phone and message are required.", "error"); return;
     }
     try {
-      const res = await authFetch("http://localhost:5000/api/whatsapp", {
+      const res = await authFetch("https://al-birr-school-backend.onrender.com//api/whatsapp", {
         method: "PUT",
         body: JSON.stringify(waForm),
       });
@@ -1132,7 +1132,7 @@ function AdminDashboard({ token, onLogout, adminPage, setAdminPage, newsItems, e
 const handleDeleteContact = async (id) => {
   if (!window.confirm("Delete this message? This cannot be undone.")) return;
   try {
-    const res  = await authFetch(`http://localhost:5000/api/contacts/${id}`, { method: "DELETE" });
+    const res  = await authFetch(`https://al-birr-school-backend.onrender.com//api/contacts/${id}`, { method: "DELETE" });
     const data = await res.json();
     if (data.success) {
       setContacts(prev => prev.filter(c => c.id !== id));
@@ -1148,12 +1148,12 @@ const handleDeleteContact = async (id) => {
   // ── Fetch contacts & enrollments ──
   useEffect(() => {
     if (adminPage === "contacts") {
-      authFetch("http://localhost:5000/api/contacts")
+      authFetch("https://al-birr-school-backend.onrender.com//api/contacts")
         .then(r => r.json())
         .then(d => { if (d.success) setContacts(d.data); });
     }
     if (adminPage === "enrollments") {
-      authFetch("http://localhost:5000/api/enrollments")
+      authFetch("https://al-birr-school-backend.onrender.com//api/enrollments")
         .then(r => r.json())
         .then(d => { if (d.success) setEnrollments(d.data); });
     }
@@ -1165,7 +1165,7 @@ const handleDeleteContact = async (id) => {
     showToast("❌ Title and description are required.", "error"); return;
   }
   try {
-    const res = await authFetch("http://localhost:5000/api/news", {
+    const res = await authFetch("https://al-birr-school-backend.onrender.com//api/news", {
       method: "POST",
       body: JSON.stringify(newsForm),
     });
@@ -1184,7 +1184,7 @@ const handleDeleteContact = async (id) => {
 
   // ── Delete News ──
   const handleDeleteNews = async (id) => {
-    const res = await authFetch(`http://localhost:5000/api/news/${id}`, { method: "DELETE" });
+    const res = await authFetch(`https://al-birr-school-backend.onrender.com//api/news/${id}`, { method: "DELETE" });
     const data = await res.json();
     if (data.success) {
       setNews(prev => prev.filter(n => n.id !== id));
@@ -1200,7 +1200,7 @@ const handleDeleteContact = async (id) => {
     showToast("❌ All fields are required.", "error"); return;
   }
   try {
-    const res = await authFetch("http://localhost:5000/api/events", {
+    const res = await authFetch("https://al-birr-school-backend.onrender.com//api/events", {
       method: "POST",
       body: JSON.stringify(eventForm),
     });
@@ -1219,7 +1219,7 @@ const handleDeleteContact = async (id) => {
 
   // ── Delete Event ──
   const handleDeleteEvent = async (id) => {
-    const res  = await authFetch(`http://localhost:5000/api/events/${id}`, { method: "DELETE" });
+    const res  = await authFetch(`https://al-birr-school-backend.onrender.com//api/events/${id}`, { method: "DELETE" });
     const data = await res.json();
     if (data.success) {
       setEvents(prev => prev.filter(e => e.id !== id));
@@ -1241,7 +1241,7 @@ const handleDeleteContact = async (id) => {
     formData.append("bio", staffForm.bio || "");
     if (staffForm.photo) formData.append("photo", staffForm.photo);
 
-    const res = await authFetch("http://localhost:5000/api/staff", {
+    const res = await authFetch("https://al-birr-school-backend.onrender.com//api/staff", {
       method: "POST",
       body: formData,
     });
@@ -1260,7 +1260,7 @@ const handleDeleteContact = async (id) => {
 
   // ── Delete Staff ──
   const handleDeleteStaff = async (id) => {
-    const res  = await authFetch(`http://localhost:5000/api/staff/${id}`, { method: "DELETE" });
+    const res  = await authFetch(`https://al-birr-school-backend.onrender.com//api/staff/${id}`, { method: "DELETE" });
     const data = await res.json();
     if (data.success) {
       setStaff(prev => prev.filter(s => s.id !== id));
@@ -1281,7 +1281,7 @@ const handleDeleteContact = async (id) => {
     showToast("❌ Title and description are required.", "error"); return;
   }
   try {
-    const res = await authFetch(`http://localhost:5000/api/news/${editingNews.id}`, {
+    const res = await authFetch(`https://al-birr-school-backend.onrender.com//api/news/${editingNews.id}`, {
       method: "PUT",
       body: JSON.stringify(newsForm),
     });
@@ -1310,7 +1310,7 @@ const handleDeleteContact = async (id) => {
     showToast("❌ All fields are required.", "error"); return;
   }
   try {
-    const res = await authFetch(`http://localhost:5000/api/events/${editingEvent.id}`, {
+    const res = await authFetch(`https://al-birr-school-backend.onrender.com//api/events/${editingEvent.id}`, {
       method: "PUT",
       body: JSON.stringify(eventForm),
     });
@@ -1344,7 +1344,7 @@ const handleDeleteContact = async (id) => {
     formData.append("bio", staffForm.bio);
     if (staffForm.photo) formData.append("photo", staffForm.photo);
 
-    const res = await authFetch(`http://localhost:5000/api/staff/${editingStaff.id}`, {
+    const res = await authFetch(`https://al-birr-school-backend.onrender.com//api/staff/${editingStaff.id}`, {
       method: "PUT",
       body: formData,
     });
@@ -1369,7 +1369,7 @@ const handleDeleteContact = async (id) => {
     formData.append("logo", logoFile);
 
     try {
-      const res = await authFetch("http://localhost:5000/api/logo", {
+      const res = await authFetch("https://al-birr-school-backend.onrender.com//api/logo", {
         method: "POST",
         body: formData,
       });
@@ -1379,7 +1379,7 @@ const handleDeleteContact = async (id) => {
         showToast("✅ Logo uploaded successfully!");
 
         // Force update all favicon elements
-        const logoUrl = "http://localhost:5000/uploads/logo.png?t=" + Date.now();
+        const logoUrl = "https://al-birr-school-backend.onrender.com//uploads/logo.png?t=" + Date.now();
 
         // Update logo state so all components refresh
         setLogo(logoUrl);
@@ -2023,7 +2023,7 @@ const handleDeleteContact = async (id) => {
                     overflow: "hidden",
                   }}>
                     {s.photo ? (
-                      <img src={`http://localhost:5000${s.photo}`} alt={s.name} style={{
+                      <img src={`https://al-birr-school-backend.onrender.com/${s.photo}`} alt={s.name} style={{
                         width: "100%", height: "100%", objectFit: "cover",
                       }} />
                     ) : s.emoji}
@@ -2282,7 +2282,7 @@ function App() {
   });
 
   const [logo, setLogo]           = useState(() => {
-    const url = "http://localhost:5000/uploads/logo.png?t=" + Date.now();
+    const url = "https://al-birr-school-backend.onrender.com//uploads/logo.png?t=" + Date.now();
     return url;
   });
 
@@ -2290,9 +2290,9 @@ function App() {
   useEffect(() => {
     const loadLogo = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/logo");
+        const res = await fetch("https://al-birr-school-backend.onrender.com//api/logo");
         if (res.ok) {
-          setLogo("http://localhost:5000/uploads/logo.png?t=" + Date.now());
+          setLogo("https://al-birr-school-backend.onrender.com//uploads/logo.png?t=" + Date.now());
           console.log("✅ Logo loaded");
         }
       } catch (error) {
@@ -2305,7 +2305,7 @@ function App() {
   // Fetch all data from backend
   // Fetch WhatsApp settings
   useEffect(() => {
-    fetch("http://localhost:5000/api/whatsapp")
+    fetch("https://al-birr-school-backend.onrender.com//api/whatsapp")
       .then(res => res.json())
       .then(data => {
         if (data.success) setWhatsapp(data.data);
@@ -2317,9 +2317,9 @@ function App() {
     const fetchAll = async () => {
       try {
         const [newsRes, eventsRes, staffRes] = await Promise.all([
-          fetch("http://localhost:5000/api/news"),
-          fetch("http://localhost:5000/api/events"),
-          fetch("http://localhost:5000/api/staff"),
+          fetch("https://al-birr-school-backend.onrender.com//api/news"),
+          fetch("https://al-birr-school-backend.onrender.com//api/events"),
+          fetch("https://al-birr-school-backend.onrender.com//api/staff"),
         ]);
 
         const newsData   = await newsRes.json();
@@ -2343,7 +2343,7 @@ function App() {
   useEffect(() => {
     const savedToken = localStorage.getItem("adminToken");
     if (savedToken) {
-      fetch("http://localhost:5000/api/admin/verify", {
+      fetch("https://al-birr-school-backend.onrender.com//api/admin/verify", {
         headers: { Authorization: `Bearer ${savedToken}` },
       })
         .then((res) => res.json())
