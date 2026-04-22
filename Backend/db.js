@@ -1,20 +1,14 @@
 // =============================================
 //  DATABASE CONNECTION
 // =============================================
-<<<<<<< HEAD
-
-=======
->>>>>>> 8923c9551e3e893ea141feb47441351b3d9ca832
 const { Pool } = require("pg");
 require("dotenv").config();
 
-if (!process.env.DATABASE_URL) {
-  console.error("❌ DATABASE_URL is not set!");
-  process.exit(1);
-}
+const connectionString = (process.env.DATABASE_URL || "")
+  .replace("&channel_binding=require", "")
+  .replace("?channel_binding=require&sslmode=require", "?sslmode=require");
 
-// Remove channel_binding parameter if present
-const connectionString = process.env.DATABASE_URL.replace("&channel_binding=require", "").replace("?channel_binding=require", "");
+console.log("🔍 DATABASE_URL present:", !!process.env.DATABASE_URL);
 
 const pool = new Pool({
   connectionString,
@@ -27,7 +21,6 @@ pool.connect()
   .catch((err) => console.error("❌ Database connection error:", err.message));
 
 module.exports = pool;
-
 
 ////  LOCAL HOST CONNECTION  ////
 
