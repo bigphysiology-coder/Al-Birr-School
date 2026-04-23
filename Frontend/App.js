@@ -722,7 +722,7 @@ function StaffPage({ onNav, staff }) {
                 >
                   {s.photo ? (
                     <img
-                      src={`https://al-birr-school-backend.onrender.com/${s.photo}`}
+                      src={s.photo}
                       alt={s.name}
                       style={{
                         width: "100%",
@@ -2027,7 +2027,7 @@ const handleDeleteContact = async (id) => {
                     overflow: "hidden",
                   }}>
                     {s.photo ? (
-                      <img src={`https://al-birr-school-backend.onrender.com/${s.photo}`} alt={s.name} style={{
+                      <img src={s.photo} alt={s.name} style={{
                         width: "100%", height: "100%", objectFit: "cover",
                       }} />
                     ) : s.emoji}
