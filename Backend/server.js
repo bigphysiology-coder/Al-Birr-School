@@ -560,7 +560,6 @@ app.get("/api/staff", async (req, res) => {
 // Add staff
 app.post("/api/staff", verifyToken, upload.single("photo"), async (req, res) => {
   const { name, role, bio } = req.body;
-  const photoPath = req.file ? `/uploads/${req.file.filename}` : null;
 
   if (!name || !role) {
     if (req.file) fs.unlinkSync(req.file.path);
@@ -571,17 +570,28 @@ app.post("/api/staff", verifyToken, upload.single("photo"), async (req, res) => 
   }
 
   try {
+    // Convert photo to base64 if uploaded, otherwise null
+    let photoBase64 = null;
+    if (req.file) {
+      const fileBuffer = fs.readFileSync(req.file.path);
+      const ext        = path.extname(req.file.originalname).toLowerCase();
+      const mimeType   = ext === ".png" ? "image/png" : "image/jpeg";
+      photoBase64      = `data:${mimeType};base64,` + fileBuffer.toString("base64");
+      fs.unlinkSync(req.file.path); // delete temp file
+    }
+
     const result = await pool.query(
       `INSERT INTO staff (name, role, bio, photo)
        VALUES ($1, $2, $3, $4) RETURNING *`,
-      [name, role, bio || "", photoPath]
+      [name, role, bio || "", photoBase64]
     );
+
     res.status(201).json({
       success: true,
       data: result.rows[0],
     });
   } catch (error) {
-    if (req.file) fs.unlinkSync(req.file.path);
+    if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
     console.error("Add staff error:", error.message);
     res.status(500).json({
       success: false,
@@ -593,7 +603,6 @@ app.post("/api/staff", verifyToken, upload.single("photo"), async (req, res) => 
 // Update staff
 app.put("/api/staff/:id", verifyToken, upload.single("photo"), async (req, res) => {
   const { name, role, bio } = req.body;
-  const photoPath = req.file ? `/uploads/${req.file.filename}` : null;
 
   if (!name || !role) {
     if (req.file) fs.unlinkSync(req.file.path);
@@ -606,36 +615,39 @@ app.put("/api/staff/:id", verifyToken, upload.single("photo"), async (req, res) 
   try {
     let query, params;
 
-    if (photoPath) {
-      // Get old photo to delete
-      const oldStaff = await pool.query("SELECT photo FROM staff WHERE id=$1", [req.params.id]);
-      if (oldStaff.rows[0]?.photo) {
-        const oldPath = path.join(__dirname, oldStaff.rows[0].photo);
-        if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
-      }
+    if (req.file) {
+      // Convert new photo to base64
+      const fileBuffer = fs.readFileSync(req.file.path);
+      const ext        = path.extname(req.file.originalname).toLowerCase();
+      const mimeType   = ext === ".png" ? "image/png" : "image/jpeg";
+      const photoBase64 = `data:${mimeType};base64,` + fileBuffer.toString("base64");
+      fs.unlinkSync(req.file.path); // delete temp file
 
-      query = `UPDATE staff SET name=$1, role=$2, bio=$3, photo=$4
-               WHERE id=$5 RETURNING *`;
-      params = [name, role, bio || "", photoPath, req.params.id];
+      query  = `UPDATE staff SET name=$1, role=$2, bio=$3, photo=$4
+                WHERE id=$5 RETURNING *`;
+      params = [name, role, bio || "", photoBase64, req.params.id];
     } else {
-      query = `UPDATE staff SET name=$1, role=$2, bio=$3
-               WHERE id=$4 RETURNING *`;
+      // No new photo — keep existing
+      query  = `UPDATE staff SET name=$1, role=$2, bio=$3
+                WHERE id=$4 RETURNING *`;
       params = [name, role, bio || "", req.params.id];
     }
 
     const result = await pool.query(query, params);
+
     if (result.rows.length === 0) {
       return res.status(404).json({
         success: false,
         message: "Staff not found.",
       });
     }
+
     res.status(200).json({
       success: true,
       data: result.rows[0],
     });
   } catch (error) {
-    if (req.file) fs.unlinkSync(req.file.path);
+    if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
     console.error("Update staff error:", error.message);
     res.status(500).json({
       success: false,
@@ -647,13 +659,7 @@ app.put("/api/staff/:id", verifyToken, upload.single("photo"), async (req, res) 
 // Delete staff
 app.delete("/api/staff/:id", verifyToken, async (req, res) => {
   try {
-    // Get staff photo before deleting
-    const staff = await pool.query("SELECT photo FROM staff WHERE id=$1", [req.params.id]);
-    if (staff.rows[0]?.photo) {
-      const photoPath = path.join(__dirname, staff.rows[0].photo);
-      if (fs.existsSync(photoPath)) fs.unlinkSync(photoPath);
-    }
-
+    // No file to delete anymore — photo is in the database
     await pool.query("DELETE FROM staff WHERE id = $1", [req.params.id]);
     res.status(200).json({
       success: true,
