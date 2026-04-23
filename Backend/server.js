@@ -730,27 +730,40 @@ app.post("/api/admin/logout", verifyToken, (req, res) => {
 //  LOGO ROUTES
 // =============================================
 
-// Get current logo
-app.get("/api/logo", (req, res) => {
+// =============================================
+//  GET LOGO ROUTE
+// =============================================
+app.get("/api/logo", async (req, res) => {
   try {
-    const logoPath = path.join(__dirname, "uploads", "logo.png");
-    if (fs.existsSync(logoPath)) {
-      res.sendFile(logoPath);
-    } else {
-      res.status(404).json({
+    const result = await pool.query(
+      "SELECT value FROM site_settings WHERE key = 'logo_base64'"
+    );
+
+    if (result.rows.length === 0 || !result.rows[0].value) {
+      return res.status(404).json({
         success: false,
         message: "Logo not found",
       });
     }
+
+    // Convert base64 back to image and send it
+    const base64Data = result.rows[0].value.replace(/^data:image\/\w+;base64,/, "");
+    const imgBuffer  = Buffer.from(base64Data, "base64");
+
+    res.set("Content-Type", "image/png");
+    res.set("Cache-Control", "public, max-age=86400");
+    res.send(imgBuffer);
+
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch logo.",
-    });
+    console.error("Get logo error:", error.message);
+    res.status(500).json({ success: false, message: "Failed to fetch logo." });
   }
 });
 
-// Upload logo
+// =============================================
+//  UPLOAD LOGO ROUTE
+// =============================================
+
 app.post("/api/logo", verifyToken, upload.single("logo"), async (req, res) => {
   try {
     if (!req.file) {
@@ -760,31 +773,36 @@ app.post("/api/logo", verifyToken, upload.single("logo"), async (req, res) => {
       });
     }
 
-    // Delete old logo if exists
-    const oldLogoPath = path.join(__dirname, "uploads", "logo.png");
-    if (fs.existsSync(oldLogoPath)) {
-      fs.unlinkSync(oldLogoPath);
-    }
+    // Convert uploaded file to base64
+    const fileBuffer = fs.readFileSync(req.file.path);
+    const base64     = "data:image/png;base64," + fileBuffer.toString("base64");
 
-    // Rename uploaded file to logo.png
-    const newLogoPath = path.join(__dirname, "uploads", "logo.png");
-    fs.renameSync(req.file.path, newLogoPath);
+    // Save base64 string to database
+    await pool.query(
+      `INSERT INTO site_settings (key, value, updated_at)
+       VALUES ('logo_base64', $1, CURRENT_TIMESTAMP)
+       ON CONFLICT (key) DO UPDATE
+       SET value = $1, updated_at = CURRENT_TIMESTAMP`,
+      [base64]
+    );
+
+    // Delete temp file from disk (we don't need it anymore)
+    fs.unlinkSync(req.file.path);
 
     res.status(200).json({
       success: true,
-      message: "Logo uploaded successfully.",
-      logoUrl: "/uploads/logo.png",
+      message: "Logo uploaded and saved to database successfully.",
+      logoUrl: "/api/logo",
     });
+
   } catch (error) {
-    if (req.file) fs.unlinkSync(req.file.path);
+    if (req.file && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
     console.error("Logo upload error:", error.message);
-    res.status(500).json({
-      success: false,
-      message: "Failed to upload logo.",
-    });
+    res.status(500).json({ success: false, message: "Failed to upload logo." });
   }
 });
-
 
 // =============================================
 //  START SERVER
