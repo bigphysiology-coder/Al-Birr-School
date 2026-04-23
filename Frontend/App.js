@@ -2281,26 +2281,23 @@ function App() {
     message: "Hello! I am interested in enrolling my child at Al-Birr Islamic Model School. Please provide more information.",
   });
 
-  const [logo, setLogo]           = useState(() => {
-    const url = "https://al-birr-school-backend.onrender.com/uploads/logo.png?t=" + Date.now();
-    return url;
-  });
+  const [logo, setLogo] = useState(null);
 
-  // Load logo on app start
-  useEffect(() => {
-    const loadLogo = async () => {
-      try {
-        const res = await fetch("https://al-birr-school-backend.onrender.com/api/logo");
-        if (res.ok) {
-          setLogo("https://al-birr-school-backend.onrender.com/uploads/logo.png?t=" + Date.now());
-          console.log("✅ Logo loaded");
-        }
-      } catch (error) {
-        console.log("Logo not found, using emoji");
+// Load logo on app start
+useEffect(() => {
+  const loadLogo = async () => {
+    try {
+      const res = await fetch("https://al-birr-school-backend.onrender.com/api/logo");
+      if (res.ok) {
+        setLogo("https://al-birr-school-backend.onrender.com/api/logo?t=" + Date.now());
+        console.log("✅ Logo loaded");
       }
-    };
-    loadLogo();
-  }, []);
+    } catch (error) {
+      console.log("Logo not found, using emoji");
+    }
+  };
+  loadLogo();
+}, []);
 
   // Fetch all data from backend
   // Fetch WhatsApp settings
