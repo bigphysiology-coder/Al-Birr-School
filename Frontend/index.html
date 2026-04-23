@@ -25,7 +25,7 @@
       }
 
       function loadLogoFavicon() {
-        const logoUrl = BACKEND + "/uploads/logo.png?t=" + Date.now();
+        const logoUrl = BACKEND + "/api/logo?t=" + Date.now();
 
         fetch(BACKEND + "/api/logo")
           .then(res => {

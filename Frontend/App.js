@@ -78,20 +78,24 @@ const footerCols = [
   },
 ];
 
-const socials = ["📘", "📸", "🐦", "▶️"];
+const socials = [];
 
 
 // =============================================
 //  SHARED COMPONENTS
 // =============================================
 
-function AlertBanner({ onNav }) {
+function AlertBanner({ whatsapp }) {
   return (
     <div className="alert-banner">
       🎓 Enrollment open for 2026–2027 school year —{" "}
       <span
         style={{ textDecoration: "underline", cursor: "pointer" }}
-        onClick={() => onNav("Contact")}
+        onClick={() => {
+          const phone = whatsapp?.phone || "2348012345678";
+          const message = encodeURIComponent(whatsapp?.message || "Hello! I am interested in enrolling my child at Al-Birr Islamic Model School.");
+          window.open(`https://wa.me/${phone}?text=${message}`, "_blank");
+        }}
       >
         Apply Now
       </span>
@@ -2403,7 +2407,7 @@ useEffect(() => {
 
   return (
     <>
-      {page !== "admin" && <AlertBanner onNav={handleNav} />}
+      {page !== "admin" && <AlertBanner whatsapp={whatsapp} />}
       {page !== "admin" && (
         <NavBar
       page={page}
